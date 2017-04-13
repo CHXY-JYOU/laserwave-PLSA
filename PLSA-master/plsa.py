@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from numpy import zeros, int8, log
-from pylab import random
+from matplotlib import pylab
 import sys
 import logging
 import time
@@ -138,7 +138,7 @@ def output():
 
 # set the default params and read the params from cmd
 K = 18  # number of topic
-maxIteration = 5
+maxIteration = 20
 threshold = 1.0
 ratingmoviesNum = 20
 movieusersNum = 20
@@ -151,10 +151,11 @@ movieusers = 'movieusertxt'
 N, M, X = preprocessing()
 
 # lamda[i, j] : p(zj|di)
-lamda = random([N, K])
-# print sum(lamda[1,:])
+lamda = pylab.random([N, K])
+
+#print lamda[1,:]
 # theta[i, j] : p(wj|zi)
-theta = random([K, M])
+theta = pylab.random([K, M])
 
 # p[i, j, k] : p(zk|di,wj)
 p = zeros([N, M, K])
@@ -188,7 +189,7 @@ M2 = frame2.shape[1]
 for i in range(0, N2):
     for j in range(0, M2):
         denominator1=0
-        for k in range(0,k):
+        for k in range(0,K):
             p[i, j, k] = theta[k, j] * lamda[i, k];
             denominator1 += p[i, j, k];
             denominatorall[i, j] = denominator1

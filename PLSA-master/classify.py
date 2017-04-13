@@ -20,14 +20,16 @@ classn=X.shape[1]
 ucol=["Action","Adventure","Animation","Children's","Comedy","Crime","Documentary","Drama","Fantasy","Film-Noir","Horror","Musical","Mystery","Romance","Sci-Fi","Thriller","War","Western"]
 for u in range(0,usern):
     max =0
+    sum = 0
     for c in range(0,classn):
-         if X.loc[u][c]>max:
+        sum+=X.loc[u][c]
+        if X.loc[u][c]>max:
             max=X.loc[u][c]
             ci=c
 
-    print max,ci
+   # print max,ci
     over.loc[u][0]=u+1
     over.loc[u][1]=ucol[ci]
-    over.loc[u][2] = max
+    over.loc[u][2] = (max/sum)
 
 over.to_csv('usercalssp.csv',index=False,header=False)
