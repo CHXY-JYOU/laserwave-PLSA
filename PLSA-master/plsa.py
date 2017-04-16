@@ -8,7 +8,7 @@ import codecs
 import numpy as np
 import pandas as pd
 import math
-
+from multiprocessing import Pool
 
 # N : number of user
 # M : number of movie
@@ -54,7 +54,8 @@ def EStep():
                     p[i, j, k] /= denominator;
 
 
-def MStep():
+def MStep1():
+    print 'mstep1'
     # update theta
     for k in range(0, K):
         denominator = 0
@@ -70,7 +71,9 @@ def MStep():
             for j in range(0, M):
                 theta[k, j] /= denominator
                 # print theta[k,j]
+def MStep2():
     # update lamda
+    print 'mstep2'
     for i in range(0, N):
         for k in range(0, K):
             lamda[i, k] = 0
@@ -86,6 +89,8 @@ def MStep():
                 lamda[i, k] /= denominator
                 # print lamda[i, k]
 
+def run(func):
+    return func()
 
 # calculate the log likelihood
 def LogLikelihood():
@@ -167,21 +172,25 @@ initializeParameters()
 # EM algorithm
 oldLoglikelihood = 1
 newLoglikelihood = 1
-for d in range(0, maxIteration):
-    print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), ' startEstep')
-    EStep()
+def main():
+    for d in range(0, maxIteration):
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), ' startEstep')
+        EStep()
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), ' startMstep')
 
-    print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), ' startMstep')
-    MStep()
+        pool=Pool(4)
+        Mlist=[MStep1,MStep2]
+        pool.map(run,Mlist)
+        pool.close()
+        pool.join()
 
-    print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), ' startlikelihood')
-    newLoglikelihood = LogLikelihood()
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), ' startlikelihood')
+        newLoglikelihood = LogLikelihood()
 
-    print("[", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), "] ", d + 1, " iteration  ",
-          str(newLoglikelihood))
-    if (oldLoglikelihood != 1 and newLoglikelihood - oldLoglikelihood < threshold):
-        break
-    oldLoglikelihood = newLoglikelihood
+        print("[", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), "] ", d + 1, " iteration  ",str(newLoglikelihood))
+        if (oldLoglikelihood != 1 and newLoglikelihood - oldLoglikelihood < threshold):
+           break
+        oldLoglikelihood = newLoglikelihood
 
 frame2 = pd.DataFrame(range(0), index=range(0, 10), columns=[range(0, 3952)])
 N2 = frame2.shape[0]
@@ -198,3 +207,6 @@ for i in range(0, N2):
 MU = frame2
 MU.to_csv('MU.csv', index=False, header=False)
 # output()
+if __name__ == '__main__':
+    # freeze_support() here if program needs to be frozen
+    main()
